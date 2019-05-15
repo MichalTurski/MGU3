@@ -29,7 +29,7 @@ class SpectrogramDataset(torch.utils.data.Dataset):
         # one_hot = torch.nn.functional.one_hot(cls, self.class_num)
         one_hot = np.eye(self.class_num)[cls].astype(int)
 
-        sample = (spectrogram, one_hot)
+        sample = (spectrogram, cls)
 
         return sample
 
