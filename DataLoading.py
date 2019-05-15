@@ -3,14 +3,21 @@ import numpy as np
 import os
 import torch.utils.data
 from torch.utils.data.sampler import SubsetRandomSampler
+import torch.nn.functional
 
 
 class SpectrogramDataset(torch.utils.data.Dataset):
-    def __init__(self, path, filename):
+    def __init__(self, path, filename, class_num):
         self.path = path
+        self.class_num = class_num
         spect_frame = pd.read_csv(os.path.join(path, filename))
         self.files = spect_frame.iloc[:, 0]
         self.classes = spect_frame.iloc[:, 1]
+
+        classes_unique = pd.Series(self.classes.unique())
+        self.cls_dict = classes_unique.to_dict()
+        inv_map = {v: k for k, v in self.cls_dict.items()}
+        self.classes = self.classes.map(inv_map)
 
     def __len__(self):
         return len(self.files)
@@ -19,13 +26,19 @@ class SpectrogramDataset(torch.utils.data.Dataset):
         spect_name = os.path.join(self.path, self.files[idx])
         spectrogram = np.load(spect_name)
         cls = self.classes.iloc[idx]
-        sample = {'spectrogram': spectrogram, 'cls': cls}
+        # one_hot = torch.nn.functional.one_hot(cls, self.class_num)
+        one_hot = np.eye(self.class_num)[cls].astype(int)
+
+        sample = (spectrogram, one_hot)
 
         return sample
 
+    def get_cls_dict(self):
+        return self.cls_dict
 
-def load_data(batch_size, num_workers, validation_split, shuffle, seed, path, filename):
-    spect_dataset = SpectrogramDataset(path, filename)
+def load_data(batch_size, num_workers, validation_split, shuffle, seed, classes_num, path, filename):
+    spect_dataset = SpectrogramDataset(path, filename, classes_num)
+    cls_dict = spect_dataset.get_cls_dict()
 
     # Creating data indices for training and validation splits:
     dataset_size = len(spect_dataset)
@@ -44,4 +57,4 @@ def load_data(batch_size, num_workers, validation_split, shuffle, seed, path, fi
                                                sampler=train_sampler, num_workers=num_workers)
     validation_loader = torch.utils.data.DataLoader(spect_dataset, batch_size=batch_size,
                                                     sampler=valid_sampler, num_workers=num_workers)
-    return train_loader, validation_loader
+    return train_loader, validation_loader, cls_dict
