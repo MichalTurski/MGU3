@@ -51,7 +51,7 @@ def plot(train_loss, test_loss, accuracy):
     plt.show()
 
 
-def roc_curves(net, test_loader, unknown_idx, cls_dict, device):
+def roc_curves(net, test_loader, cls_dict, device):
     with torch.no_grad():
         outputs = []
         labels_vec = []

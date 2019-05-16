@@ -90,6 +90,6 @@ for epoch in range(epochs):
 
     prev_loss = test_loss
 Checks.plot(train_loss_list, test_loss_list, accuracy_list)
-Checks.roc_curves(best_net, test_set, unknown_idx, cls_dict, device)
+Checks.roc_curves(best_net, test_set, cls_dict, device)
 
 
