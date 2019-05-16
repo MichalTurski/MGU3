@@ -5,6 +5,7 @@ import Checks
 import torch.nn as nn
 import torch.optim as optim
 import torch
+import copy
 
 
 # spect_dataset = DataLoading.SpectrogramDataset("spectrogram_dataset/", "All_files.csv")
@@ -13,7 +14,7 @@ import torch
 learning_rate = 0.001
 momentum = 0.9
 
-epochs = 70
+epochs = 3
 verbose = True
 batch_size = 32
 num_workers = 8
@@ -29,18 +30,12 @@ train_set, test_set, cls_dict, unknown_idx = DataLoading.load_data(batch_size, n
 net = Network.LSTM(128, 128, classes_num)
 optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=momentum)
 loss_function = nn.CrossEntropyLoss()
+lowest_loss = float("inf")
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 if verbose: print(f"I'm training on {device}")
 net.to(device)
-
-
-# for idx, (inputs, labels) in enumerate(train_set):
-#     print(idx)
-#     outputs = net(inputs.type('torch.FloatTensor').permute(2, 0, 1))
-#     loss = loss_function(outputs, labels)
-#     loss.backward()
-#     optimizer.step()
+best_net = copy.deepcopy(net)
 
 accuracy = Checks.accuracy(test_set, net, device, unknown_idx)
 accuracy_list = [accuracy]
@@ -89,12 +84,12 @@ for epoch in range(epochs):
     # else:
     #     loss_rise_count = 0
     #
-    # if test_loss < lowest_loss:
-    #     best_net = copy.deepcopy(net)
-    #     lowest_loss = test_loss
+    if test_loss < lowest_loss:
+        best_net = copy.deepcopy(net)
+        lowest_loss = test_loss
 
     prev_loss = test_loss
 Checks.plot(train_loss_list, test_loss_list, accuracy_list)
-# Checks.roc_curves(best_net, test_loader, classes, device)
+Checks.roc_curves(best_net, test_set, unknown_idx, cls_dict, device)
 
 
