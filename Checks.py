@@ -23,13 +23,13 @@ def accuracy(test_loader, net, device, unknown_idx):
         total = 0
         for (inputs, labels) in test_loader:
             inputs = inputs.permute(2, 0, 1).type('torch.FloatTensor').to(device)
-            labels.map_(labels, (lambda x, y: x in unknown_idx))
+            labels.map_(labels, (lambda x, y: -1 if (x in unknown_idx) else x))
             # labels = labels.to(device)
 
             outputs = net(inputs)
             _, predicted = torch.max(outputs.data, 1)
             predicted = predicted.to("cpu")
-            predicted.map_(predicted, (lambda x, y: x in unknown_idx))
+            predicted.map_(predicted, (lambda x, y: -1 if (x in unknown_idx) else x))
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
         return correct/total
