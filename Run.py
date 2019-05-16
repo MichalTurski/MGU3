@@ -16,7 +16,7 @@ classes_num = 30
 epochs = 4
 verbose = True
 
-train_set, test_set, cls_dict = DataLoading.load_data(1, 4, 0.2, True, 123, classes_num,
+train_set, test_set, cls_dict = DataLoading.load_data(16, 4, 0.2, True, 123, classes_num,
                                                       "spectrogram_dataset/", "All_files.csv")
 net = Network.LSTM(128, 128, classes_num)
 optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=momentum)
@@ -40,13 +40,15 @@ net.to(device)
 # test_loss_list = [test_loss]
 # accuracy = Checks.accuracy(test_set, net, device)
 # accuracy_list = [accuracy]
+#
+# if verbose:
+#     print(f'[epoch {0}] train loss = {train_loss:.3f}, '
+#           f'test loss = {test_loss:.3f}, accuracy = {accuracy * 100:.2f}%')
+
 train_loss_list = []
 test_loss_list = []
 accuracy_list = []
 
-# if verbose:
-#     print(f'[epoch {0}] train loss = {train_loss:.3f}, '
-#           f'test loss = {test_loss:.3f}, accuracy = {accuracy * 100:.2f}%')
 
 for epoch in range(epochs):
     train_loss = 0.0
@@ -54,7 +56,7 @@ for epoch in range(epochs):
         inputs = inputs.permute(2, 0, 1).type('torch.FloatTensor')
         inputs = inputs.to(device)
         labels = labels.to(device)
-        print(i)
+        # print(i)
 
         optimizer.zero_grad()
         outputs = net(inputs)
@@ -86,4 +88,5 @@ for epoch in range(epochs):
     prev_loss = test_loss
 Checks.plot(train_loss_list, test_loss_list, accuracy_list)
 # Checks.roc_curves(best_net, test_loader, classes, device)
+
 
