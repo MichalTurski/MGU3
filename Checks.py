@@ -9,6 +9,7 @@ def test_loss(test_loader, net, device, loss_function):
         loss = 0.0
         for i, (inputs, labels) in enumerate(test_loader, 0):
             inputs = inputs.permute(2, 0, 1).type('torch.FloatTensor').to(device)
+            # labels.map_(labels, (lambda x, y: x in unknown_idx))
             labels = labels.to(device)
 
             outputs = net(inputs)
@@ -16,16 +17,19 @@ def test_loss(test_loader, net, device, loss_function):
         return loss/i
 
 
-def accuracy(test_loader, net, device):
+def accuracy(test_loader, net, device, unknown_idx):
     with torch.no_grad():
         correct = 0
         total = 0
         for (inputs, labels) in test_loader:
             inputs = inputs.permute(2, 0, 1).type('torch.FloatTensor').to(device)
-            labels = labels.to(device)
+            labels.map_(labels, (lambda x, y: x in unknown_idx))
+            # labels = labels.to(device)
 
             outputs = net(inputs)
             _, predicted = torch.max(outputs.data, 1)
+            predicted = predicted.to("cpu")
+            predicted.map_(predicted, (lambda x, y: x in unknown_idx))
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
         return correct/total

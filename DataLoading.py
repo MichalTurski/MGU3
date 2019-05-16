@@ -16,8 +16,26 @@ class SpectrogramDataset(torch.utils.data.Dataset):
 
         classes_unique = pd.Series(self.classes.unique())
         self.cls_dict = classes_unique.to_dict()
-        inv_map = {v: k for k, v in self.cls_dict.items()}
-        self.classes = self.classes.map(inv_map)
+        inv_dict = {v: k for k, v in self.cls_dict.items()}
+        self.classes = self.classes.map(inv_dict)
+
+        # Create dictionary that maps "unknown" into one class.
+        unknown_categories = [
+            " bed",
+            " bird",
+            " cat",
+            " dog",
+            " happy",
+            " house",
+            " marvin",
+            " sheila",
+            " tree",
+            " wow"
+        ]
+        self. unknown_idx = set(map(lambda x: inv_dict[x], unknown_categories))
+        self.unknown_dict = {key: -1 for key in self.unknown_idx}
+        self.cls_dict[-1] = " unknown"
+
 
     def __len__(self):
         return len(self.files)
@@ -36,9 +54,17 @@ class SpectrogramDataset(torch.utils.data.Dataset):
     def get_cls_dict(self):
         return self.cls_dict
 
+    def get_unknown_dict(self):
+        return self.unknown_dict
+
+    def get_unknown_idx(self):
+        return self.unknown_idx
+
+
 def load_data(batch_size, num_workers, validation_split, shuffle, seed, classes_num, path, filename):
     spect_dataset = SpectrogramDataset(path, filename, classes_num)
     cls_dict = spect_dataset.get_cls_dict()
+    unknown_idx = spect_dataset.get_unknown_idx()
 
     # Creating data indices for training and validation splits:
     dataset_size = len(spect_dataset)
@@ -57,4 +83,4 @@ def load_data(batch_size, num_workers, validation_split, shuffle, seed, classes_
                                                sampler=train_sampler, num_workers=num_workers)
     validation_loader = torch.utils.data.DataLoader(spect_dataset, batch_size=batch_size,
                                                     sampler=valid_sampler, num_workers=num_workers)
-    return train_loader, validation_loader, cls_dict
+    return train_loader, validation_loader, cls_dict, unknown_idx

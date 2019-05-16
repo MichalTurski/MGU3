@@ -12,11 +12,19 @@ import torch
 
 learning_rate = 0.001
 momentum = 0.9
-classes_num = 30
-epochs = 4
-verbose = True
 
-train_set, test_set, cls_dict = DataLoading.load_data(16, 4, 0.2, True, 123, classes_num,
+epochs = 2
+verbose = True
+batch_size = 32
+num_workers = 8
+val_split = 0.2
+shuffle = True
+random_seed = 123
+classes_num = 30
+
+train_set, test_set, cls_dict, unknown_idx = DataLoading.load_data(batch_size, num_workers,
+                                                                   val_split, shuffle, random_seed,
+                                                                   classes_num,
                                                       "spectrogram_dataset/", "All_files.csv")
 net = Network.LSTM(128, 128, classes_num)
 optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=momentum)
@@ -34,21 +42,21 @@ net.to(device)
 #     loss.backward()
 #     optimizer.step()
 
-# train_loss = Checks.test_loss(test_set, net, device, loss_function)
-# train_loss_list = [train_loss]
-# test_loss = Checks.test_loss(test_set, net, device, loss_function)
-# test_loss_list = [test_loss]
-# accuracy = Checks.accuracy(test_set, net, device)
-# accuracy_list = [accuracy]
-#
-# if verbose:
-#     print(f'[epoch {0}] train loss = {train_loss:.3f}, '
-#           f'test loss = {test_loss:.3f}, accuracy = {accuracy * 100:.2f}%')
+accuracy = Checks.accuracy(test_set, net, device, unknown_idx)
+accuracy_list = [accuracy]
+train_loss = Checks.test_loss(test_set, net, device, loss_function)
+train_loss_list = [train_loss]
+test_loss = Checks.test_loss(test_set, net, device, loss_function)
+test_loss_list = [test_loss]
 
-train_loss_list = []
-test_loss_list = []
-accuracy_list = []
 
+if verbose:
+    print(f'[epoch {0}] train loss = {train_loss:.3f}, '
+          f'test loss = {test_loss:.3f}, accuracy = {accuracy * 100:.2f}%')
+
+# train_loss_list = []
+# test_loss_list = []
+# accuracy_list = []
 
 for epoch in range(epochs):
     train_loss = 0.0
@@ -69,7 +77,7 @@ for epoch in range(epochs):
     train_loss_list.append(train_loss)
     test_loss = Checks.test_loss(test_set, net, device, loss_function)
     test_loss_list.append(test_loss)
-    accuracy = Checks.accuracy(test_set, net, device)
+    accuracy = Checks.accuracy(test_set, net, device, unknown_idx)
     accuracy_list.append(accuracy)
     if verbose:
         print(f'[epoch {epoch + 1}] train loss = {train_loss:.3f}, '
