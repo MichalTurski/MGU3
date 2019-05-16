@@ -56,7 +56,9 @@ def roc_curves(net, test_loader, cls_dict, device):
         outputs = []
         labels_vec = []
         for (inputs, labels) in test_loader:
+            print(f"input shape before permutation {inputs.shape}")
             inputs = inputs.permute(2, 0, 1).type('torch.FloatTensor').to(device)
+            print(f"input shape after permutation {inputs.shape}")
             outputs_cpu = net(inputs).cpu()
             for output in outputs_cpu:
                 outputs.append(output.detach().numpy())
