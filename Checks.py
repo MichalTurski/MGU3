@@ -8,7 +8,7 @@ def test_loss(test_loader, net, device, loss_function):
     with torch.no_grad():
         loss = 0.0
         for i, (inputs, labels) in enumerate(test_loader, 0):
-            inputs = inputs.permute(2, 0, 1).type('torch.FloatTensor').to(device)
+            inputs = inputs.type('torch.FloatTensor').to(device)
             # labels.map_(labels, (lambda x, y: x in unknown_idx))
             labels = labels.to(device)
 
@@ -22,7 +22,7 @@ def accuracy(test_loader, net, device, unknown_idx):
         correct = 0
         total = 0
         for (inputs, labels) in test_loader:
-            inputs = inputs.permute(2, 0, 1).type('torch.FloatTensor').to(device)
+            inputs = inputs.type('torch.FloatTensor').to(device)
             labels.map_(labels, (lambda x, y: -1 if (x in unknown_idx) else x))
             # labels = labels.to(device)
 

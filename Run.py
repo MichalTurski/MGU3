@@ -14,7 +14,7 @@ import copy
 learning_rate = 0.001
 momentum = 0.9
 
-epochs = 70
+epochs = 1
 verbose = True
 batch_size = 32
 num_workers = 8
@@ -56,7 +56,7 @@ if verbose:
 for epoch in range(epochs):
     train_loss = 0.0
     for i, (inputs, labels) in enumerate(train_set, 0):
-        inputs = inputs.permute(2, 0, 1).type('torch.FloatTensor')
+        inputs = inputs.type('torch.FloatTensor')
         inputs = inputs.to(device)
         labels = labels.to(device)
         # print(i)
