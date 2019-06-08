@@ -16,18 +16,19 @@ momentum = 0.9
 
 epochs = 70
 verbose = True
-batch_size = 32
+batch_size = 16
 num_workers = 8
 val_split = 0.2
 shuffle = True
 random_seed = 123
 classes_num = 30
+time_len = 44 # Each spectrogram contains 44 time-elements
 
 train_set, test_set, cls_dict, unknown_idx = DataLoading.load_data(batch_size, num_workers,
                                                                    val_split, shuffle, random_seed,
                                                                    classes_num,
                                                       "spectrogram_dataset/", "All_files.csv")
-net = Network.LSTM(128, 128, classes_num)
+net = Network.LSTM_att(128, 128, classes_num, time_len)
 optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=momentum)
 loss_function = nn.CrossEntropyLoss()
 lowest_loss = float("inf")
