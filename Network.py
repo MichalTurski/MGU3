@@ -33,14 +33,16 @@ class LSTM_att(nn.Module):
         super(LSTM_att, self).__init__()
         self.convolution = nn.Conv2d(1, self.conv_channels, 3, padding=1, groups=1)
         self.lstm = nn.LSTM(in_size * self.conv_channels, hidden_size, bidirectional=True)
-        self.fc = nn.Linear(2 * hidden_size * time_len, out_size) # 2 is for bidirectional
+        # self.fc = nn.Linear(2 * hidden_size * time_len, out_size) # 2 is for bidirectional
+        self.fc = nn.Linear(2 * hidden_size * 2, out_size) # 2 is for bidirectional, another 2 in for first and last output
 
     def forward(self, input):
         input = input.unsqueeze(3).permute(0, 3, 1, 2)
         conv_out = F.relu(self.convolution(input))
         lstm_in = conv_out.view(-1, self.conv_channels * self.in_size, self.time_len).permute(2, 0, 1)
         lstm_out, _ = self.lstm(lstm_in)
-        fc_in = lstm_out.view(-1, self.time_len * 2 * self.hidden_size)
+        #fc_in = lstm_out.view(-1, self.time_len * 2 * self.hidden_size)
+        fc_in = lstm_out[[1, -1], :, :].view(-1, self.time_len * 2 * self.hidden_size) # Get first and last out (bidirectional LSTM)
         # print(fc_in.shape)
         fc_out = self.fc(fc_in)
         tag_scores = F.log_softmax(fc_out, dim=1)
