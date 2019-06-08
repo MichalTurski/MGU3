@@ -42,7 +42,7 @@ class LSTM_att(nn.Module):
         lstm_in = conv_out.view(-1, self.conv_channels * self.in_size, self.time_len).permute(2, 0, 1)
         lstm_out, _ = self.lstm(lstm_in)
         #fc_in = lstm_out.view(-1, self.time_len * 2 * self.hidden_size)
-        fc_in = lstm_out[[1, -1], :, :].view(-1, self.time_len * 2 * self.hidden_size) # Get first and last out (bidirectional LSTM)
+        fc_in = lstm_out[[1, -1], :, :].view(-1, 2 * 2 * self.hidden_size) # Get first and last out (bidirectional LSTM)
         # print(fc_in.shape)
         fc_out = self.fc(fc_in)
         tag_scores = F.log_softmax(fc_out, dim=1)
