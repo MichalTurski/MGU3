@@ -28,7 +28,7 @@ train_set, test_set, cls_dict, unknown_idx = DataLoading.load_data(batch_size, n
                                                                    val_split, shuffle, random_seed,
                                                                    classes_num,
                                                       "spectrogram_dataset/", "All_files.csv")
-net = Network.LSTM_att(128, 128, classes_num, time_len)
+net = Network.LSTM_att(128, 70, classes_num, time_len)
 optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=momentum)
 loss_function = nn.CrossEntropyLoss()
 lowest_loss = float("inf")
