@@ -36,6 +36,7 @@ def accuracy(test_loader, net, device, unknown_idx):
 
 
 def plot(train_loss, test_loss, accuracy):
+    plt.rcParams["figure.figsize"] = [16,9]
     plt.subplot(211)
     plt.plot(train_loss, linestyle='-.', label='training')
     plt.plot(test_loss, linestyle='-', label='test')
@@ -69,6 +70,7 @@ def roc_curves(net, test_loader, cls_dict, device):
         y_expected = labels_array == i
         fpr, tpr, thresholds = roc_curve(y_expected, digit_pred)
         roc_auc = auc(fpr, tpr)
+        plt.rcParams["figure.figsize"] = [16, 9]
         plt.plot(fpr, tpr, lw=2, alpha=0.9, color='r', label='ROC curve')
         plt.plot([0, 1], [0, 1], linestyle='--', lw=1, color='g', label='Random classifier', alpha=0.4)
         plt.title(f"ROC curve for class {cls_dict[i]}, AUC = {roc_auc}")
