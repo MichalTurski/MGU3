@@ -14,7 +14,7 @@ import copy
 learning_rate = 0.001
 momentum = 0.9
 
-epochs = 1
+epochs = 100
 verbose = True
 batch_size = 16
 num_workers = 8
