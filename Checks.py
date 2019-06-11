@@ -53,6 +53,7 @@ def plot(train_loss, test_loss, accuracy):
 
 
 def roc_curves(net, test_loader, cls_dict, device):
+    print("I'm in new roc curves")
     with torch.no_grad():
         outputs = []
         labels_vec = []
