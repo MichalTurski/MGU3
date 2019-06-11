@@ -2,6 +2,7 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import roc_curve, auc
+from torch.nn.functional import softmax
 
 
 def test_loss(test_loader, net, device, loss_function):
@@ -61,7 +62,7 @@ def roc_curves(net, test_loader, cls_dict, device):
             inputs = inputs.permute(2, 0, 1).type('torch.FloatTensor').to(device)
             outputs_cpu = net(inputs).cpu()
             for output in outputs_cpu:
-                outputs.append(output.detach().numpy())
+                outputs.append(softmax(output).detach().numpy())
             for label in labels:
                 labels_vec.append(label.detach().numpy())
     outputs_array = np.array(outputs)
