@@ -41,6 +41,7 @@ class LSTM_att(nn.Module):
 
     def forward(self, input):
         input = input.unsqueeze(3).permute(0, 3, 1, 2)
+
         conv_mid = F.relu(self.convolution_1(input))
         conv_out = F.relu(self.convolution_2(conv_mid))
         lstm_in = conv_out.view(-1, self.conv_channels_2 * self.in_size, self.time_len).permute(2, 0, 1)

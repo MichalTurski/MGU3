@@ -14,7 +14,7 @@ import copy
 learning_rate = 0.001
 momentum = 0.9
 
-epochs = 100
+epochs = 3
 verbose = True
 batch_size = 16
 num_workers = 8
@@ -86,6 +86,7 @@ for epoch in range(epochs):
     #     loss_rise_count = 0
     #
     if test_loss < lowest_loss:
+        print("There is lower loss")
         best_net = copy.deepcopy(net)
         lowest_loss = test_loss
 

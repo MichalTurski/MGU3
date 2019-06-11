@@ -67,7 +67,7 @@ def roc_curves(net, test_loader, cls_dict, device):
     labels_array = np.array(labels_vec)
     for i in range(len(cls_dict) - 1): # -1 is for unknown class
         digit_pred = outputs_array[:, i]
-        y_expected = labels_array == i
+        y_expected = (labels_array == i)
         fpr, tpr, thresholds = roc_curve(y_expected, digit_pred)
         roc_auc = auc(fpr, tpr)
         plt.rcParams["figure.figsize"] = [16, 9]
